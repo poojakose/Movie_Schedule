@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Movie Schedule</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <style>
+        body {
+            padding: 20px;
+        }
+        h1 {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .filter-form {
+            margin-bottom: 20px;
+        }
+        .custom-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .dropdown-checkboxes {
+            position: absolute;
+            z-index: 9999; 
+            background-color: #fff;
+            max-height: 200px; 
+            overflow-y: auto;
+            min-width: 200px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .dropdown-checkboxes label {
+            display: block;
+            margin-bottom: 5px;
+        }
+       .movie-list {
+           display: grid;
+           grid-template-columns: repeat(3, 1fr);
+           grid-gap: 20px;
+           list-style-type: none;
+           padding-left: 0;
+       }
+       .movie-card {
+           padding: 20px;
+           background-color: #f8f9fa;
+           border: 1px solid #e9ecef;
+           border-radius: 4px;
+       }
+       .movie-title {
+           margin-bottom: 10px;
+           font-weight: bold;
+       }
+       .movie-poster {
+           max-width: 100%;
+           height: auto;
+           margin-bottom: 10px;
+       }
+       .movie-info {
+           margin-bottom: 10px;
+       }
+    </style>
+</head>
+<body>
+    <h1>Movie Schedule</h1>
+    <form class="filter-form" action="/movies" method="POST">
+        <div class="form-group">
+            <label>Filter by Genre:</label>
+            <br>
+            <div class="custom-dropdown">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="genreDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Select Genres
+                </button>
+                <div class="dropdown-checkboxes" aria-labelledby="genreDropdown">
+                    {% for genre in genres %}
+                    <label class="dropdown-item">
+                        <input type="checkbox" name="genre" value="{{ genre }}"> {{ genre }}
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="search">Search by Title:</label>
+            <input class="form-control" type="text" name="search">
+        </div>
+        <button class="btn btn-primary" type="submit">Apply Filters</button>
+    </form>
+
+    <ul class="movie-list">
+        {% for movie in movies %}
+        <li class="movie-card">
+            <h2 class="movie-title">{{ movie.title }}</h2>
+            <img class="movie-poster" src="{{ movie.poster }}" alt="{{ movie.title }} Poster">
+            <p class="movie-info">Genre(s): {{ movie.genre|join(', ') }}</p>
+            <p class="movie-info">Rating: {{ movie.rating }}</p>
+            <p class="movie-info">Year Release: {{ movie.year }}</p>
+            <p class="movie-info">Metacritic Rating: {{ movie.meta_score }}</p>
+            <p class="movie-info">Runtime: {{ movie.runtime }}</p>
+        </li>
+        {% endfor %}
+    </ul>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('.dropdown-checkboxes input[type="checkbox"]').on('click', function() {
+                var selectedValues = [];
+                $('.dropdown-checkboxes input:checked').each(function() {
+                    selectedValues.push($(this).val());
+                });
+
+                var buttonText = selectedValues.length > 0 ? selectedValues.join(', ') : 'Select Genres';
+                $('#genreDropdown').text(buttonText);
+            });
+
+            $(document).on('click', function(event) {
+                var dropdown = $('.dropdown-checkboxes');
+                if (!dropdown.is(event.target) && dropdown.has(event.target).length === 0) {
+                    dropdown.hide();
+                }
+            });
+
+            $('.custom-dropdown').on('click', function() {
+                var dropdown = $(this).find('.dropdown-checkboxes');
+                dropdown.toggle();
+            });
+        });
+    </script>
+</body>
+</html>
